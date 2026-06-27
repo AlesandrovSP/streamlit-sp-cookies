@@ -5,7 +5,6 @@
 (function(){
   "use strict";
 
-  // Lee del parent (mismo dominio — allow-same-origin en sandbox de Streamlit)
   function parseCookies(){
     var o={};
     try{
@@ -33,20 +32,28 @@
     try{ window.parent.document.cookie=s; }catch(e){ document.cookie=s; }
   }
 
-  function send(type,payload){
-    window.parent.postMessage(Object.assign({type:type},payload),"*");
+  function send(type, payload){
+    window.parent.postMessage(Object.assign({type:type}, payload), "*");
   }
 
-  window.addEventListener("message",function(e){
-    if(!e.data||e.data.type!=="streamlit:render")return;
-    var a=e.data.args||{};
-    if(a.action==="write"&&a.name) setCookie(a.name,a.value||"",a.max_age||604800);
-    else if(a.action==="delete"&&a.name) delCookie(a.name);
-    send("streamlit:setComponentValue",{value:{cookies:parseCookies()}});
+  function reply(){
+    send("streamlit:setComponentValue", {value:{cookies:parseCookies()}});
+  }
+
+  window.addEventListener("message", function(e){
+    if(!e.data || e.data.type !== "streamlit:render") return;
+    var a = e.data.args || {};
+    if(a.action === "write" && a.name) setCookie(a.name, a.value||"", a.max_age||604800);
+    else if(a.action === "delete" && a.name) delCookie(a.name);
+    reply();
   });
 
-  send("streamlit:componentReady",{apiVersion:1});
-  send("streamlit:setFrameHeight",{height:0});
+  // Handshake
+  send("streamlit:componentReady", {apiVersion:1});
+  send("streamlit:setFrameHeight", {height:0});
+  // ← Envía valor inmediatamente sin esperar render
+  // Esto evita el timeout en el primer render
+  reply();
 })();
 </script>
 </head>
