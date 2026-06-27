@@ -48,12 +48,9 @@
     reply();
   });
 
-  // Handshake
   send("streamlit:componentReady", {apiVersion:1});
   send("streamlit:setFrameHeight", {height:0});
-  // ← Envía valor inmediatamente sin esperar render
-  // Esto evita el timeout en el primer render
-  reply();
+  reply(); // ← fix: no espera render, evita timeout
 })();
 </script>
 </head>
