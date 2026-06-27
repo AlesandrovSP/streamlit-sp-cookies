@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamlit-sp-cookies"
+version = "0.1.0"
+description = "Persistent cookie manager for Streamlit - no third party dependencies"
+requires-python = ">=3.9"
+dependencies = ["streamlit>=1.30.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+streamlit_sp_cookies = ["frontend/*"]
